@@ -1,34 +1,33 @@
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #include <imgui.h>
-#include <imgui_impl_sdl2.h>
-#include <imgui_impl_sdlrenderer2.h>
+#include <imgui_impl_SDL3.h>
+#include <imgui_impl_sdlrenderer3.h>
 #include <memory>
+
+#include <iostream>
 
 constexpr int WINDOW_MINIMUM_WIDTH = 1280;
 constexpr int WINDOW_MINIMUM_HEIGHT = 720;
-constexpr char WINDOW_TITLE[] = "SDL2 template";
-constexpr auto WINDOW_FLAGS = SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
+constexpr char WINDOW_TITLE[] = "SDL3 template";
+constexpr auto WINDOW_FLAGS = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
 int main(int argc, char **argv)
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Init(SDL_INIT_AUDIO| SDL_INIT_VIDEO);
 
-    std::unique_ptr<SDL_Window, decltype([](SDL_Window *w) { SDL_DestroyWindow(w); })> window{
-        SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_MINIMUM_WIDTH,
-                         WINDOW_MINIMUM_HEIGHT, WINDOW_FLAGS)};
+    auto window = 
+        SDL_CreateWindow(WINDOW_TITLE, WINDOW_MINIMUM_WIDTH, WINDOW_MINIMUM_HEIGHT, WINDOW_FLAGS);
 
-    SDL_SetWindowMinimumSize(window.get(), WINDOW_MINIMUM_WIDTH, WINDOW_MINIMUM_HEIGHT);
+    SDL_SetWindowMinimumSize(window, WINDOW_MINIMUM_WIDTH, WINDOW_MINIMUM_HEIGHT);
 
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-
-    std::unique_ptr<SDL_Renderer, decltype([](SDL_Renderer *r) { SDL_DestroyRenderer(r); })> renderer{
-        SDL_CreateRenderer(window.get(), -1, 0)};
+    auto renderer = SDL_CreateRenderer(window, "opengl");
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImGui_ImplSDL2_InitForSDLRenderer(window.get(), renderer.get());
-    ImGui_ImplSDLRenderer2_Init(renderer.get());
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
 
     bool is_running{true};
     while (is_running)
@@ -36,18 +35,18 @@ int main(int argc, char **argv)
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT)
+            ImGui_ImplSDL3_ProcessEvent(&event);
+            if (event.type == SDL_EVENT_QUIT)
             {
                 is_running = false;
                 break;
             }
         }
 
-        SDL_RenderClear(renderer.get());
+        SDL_RenderClear(renderer);
 
-        ImGui_ImplSDL2_NewFrame();
-        ImGui_ImplSDLRenderer2_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui_ImplSDLRenderer3_NewFrame();
 
         ImGui::NewFrame();
         {
@@ -55,7 +54,7 @@ int main(int argc, char **argv)
             {
                 if (ImGui::Button("Hello World"))
                 {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Hello", "Hello World", window.get());
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Hello", "Hello World", window);
                 }
             }
             ImGui::End();
@@ -64,17 +63,18 @@ int main(int argc, char **argv)
         ImGui::EndFrame();
         ImGui::Render();
 
-        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer.get());
-        SDL_RenderPresent(renderer.get());
+        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
+        SDL_RenderPresent(renderer);
         SDL_Delay(1);
     }
 
-    ImGui_ImplSDLRenderer2_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
-    renderer.reset();
-    window.reset();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+
     SDL_Quit();
 
     return EXIT_SUCCESS;

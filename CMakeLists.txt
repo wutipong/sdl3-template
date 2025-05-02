@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 
 # set the project name
-project(sdl2-template)
+project(sdl3-template)
 
 # add the executable
 add_executable(main "src/main.cpp")
@@ -16,12 +16,12 @@ if (MSVC)
         target_compile_options(main PRIVATE /Zc:__cplusplus)
 endif ()
 
-find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
 target_link_libraries(main PRIVATE
-        SDL2::SDL2 
-        SDL2::SDL2main
+        SDL3::SDL3 
+        # SDL3::SDL3main
         imgui::imgui
 )
 
