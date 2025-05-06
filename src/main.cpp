@@ -43,8 +43,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
     ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer3_Init(renderer);
 
-    bool is_running = true;
-
     return SDL_APP_CONTINUE;
 }
 
