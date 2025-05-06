@@ -11,8 +11,11 @@ constexpr int WINDOW_MINIMUM_HEIGHT = 720;
 constexpr char WINDOW_TITLE[] = "SDL3 template";
 constexpr auto WINDOW_FLAGS = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
-SDL_Renderer *renderer;
-SDL_Window *window;
+namespace
+{
+    SDL_Renderer *renderer;
+    SDL_Window *window;
+} // namespace
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 {
